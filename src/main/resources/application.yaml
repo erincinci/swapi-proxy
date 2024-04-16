@@ -1,0 +1,38 @@
+spring:
+  application:
+    name: SWAPI-Proxy
+  cache:
+    jcache:
+      provider: com.github.benmanes.caffeine.jcache.spi.CaffeineCachingProvider
+    cache-names:
+      - rate-limit-bucket
+      - people
+      - films
+      - starships
+      - vehicles
+      - species
+      - planets
+    caffeine:
+      spec: maximumSize=100000,expireAfterAccess=1d
+
+server:
+  port: 8080
+
+client:
+  swapi:
+    baseUrl: https://swapi.dev/api/
+    rateLimit: 10000 # per day
+
+bucket4j:
+  enabled: true
+  filters:
+    - cache-name: rate-limit-bucket
+      cache-key: getRemoteAddr()
+      url: /api/.*
+      hide-http-response-headers: true
+      rate-limits:
+        - bandwidths:
+            - capacity: 10000
+              time: 1
+              unit: days
+              refill-speed: greedy

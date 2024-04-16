@@ -24,11 +24,24 @@ repositories {
 dependencies {
     // Spring Boot
     implementation("org.springframework.boot:spring-boot-starter-cache")
+    implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-web")
+
+    // Caffeine In-memory Cache
+    implementation("javax.cache:cache-api:1.1.1")
+    implementation("com.github.ben-manes.caffeine:caffeine:3.1.8")
+    implementation("com.github.ben-manes.caffeine:jcache:3.1.8")
+
+    // Bucket4j rate-limiter
+    implementation("com.giffing.bucket4j.spring.boot.starter:bucket4j-spring-boot-starter:0.12.6")
 
     // Lombok
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
+
+    // Retrofit HTTP Client
+    implementation("com.squareup.retrofit2:retrofit:2.11.0")
+    implementation("com.squareup.retrofit2:converter-jackson:2.11.0")
 
     // Test
     testImplementation("org.springframework.boot:spring-boot-starter-test")
