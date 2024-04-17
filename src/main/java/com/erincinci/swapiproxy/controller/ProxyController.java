@@ -28,7 +28,6 @@ public class ProxyController {
 
     @GetMapping("/entity/{type}/{id}")
     public ResponseEntity<? extends BaseEntity> getEntity(@PathVariable String type, @PathVariable String id) {
-        // TODO: Enhance response with rate-limit metadata
         final EntityType entityType = EntityType.fromValue(type);
         try {
             switch (entityType) {
@@ -41,19 +40,15 @@ public class ProxyController {
                 case VEHICLES:
                 case STARSHIPS:
                 default:
-                    return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
             }
         } catch (IOException e) {
             logger.error("Error in API call", e);
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
     private ResponseEntity<? extends BaseEntity> mapToResponse(Optional<? extends BaseEntity> entity) {
         return entity.map(ResponseEntity::ok).orElse(new ResponseEntity<>(null, HttpStatus.BAD_GATEWAY));
-    }
-
-    private String rateLimitCacheKey(String remoteAddr) {
-        return "/api/.*-" + remoteAddr;
     }
 }

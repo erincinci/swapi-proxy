@@ -15,6 +15,11 @@ spring:
     caffeine:
       spec: maximumSize=100000,expireAfterAccess=1d
 
+rate-limit:
+  cacheName: rate-limit-bucket
+  headerKey: RateLimit-Remaining
+  cacheKeyPrefix: /api/.*-
+
 client:
   swapi:
     baseUrl: https://swapi.dev/api/

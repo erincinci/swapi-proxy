@@ -18,6 +18,11 @@ spring:
 server:
   port: 8080
 
+rate-limit:
+  cacheName: rate-limit-bucket # should be same with spring cache definition
+  headerKey: RateLimit-Remaining
+  cacheKeyPrefix: /api/.*- # starting with bucket4j.filters.url value
+
 client:
   swapi:
     baseUrl: https://swapi.dev/api/
