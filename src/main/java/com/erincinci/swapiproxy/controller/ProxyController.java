@@ -28,6 +28,7 @@ public class ProxyController {
 
     @GetMapping("/entity/{type}/{id}")
     public ResponseEntity<? extends BaseEntity> getEntity(@PathVariable String type, @PathVariable String id) {
+        // TODO: Enhance response with rate-limit metadata
         final EntityType entityType = EntityType.fromValue(type);
         try {
             switch (entityType) {
@@ -50,5 +51,9 @@ public class ProxyController {
 
     private ResponseEntity<? extends BaseEntity> mapToResponse(Optional<? extends BaseEntity> entity) {
         return entity.map(ResponseEntity::ok).orElse(new ResponseEntity<>(null, HttpStatus.BAD_GATEWAY));
+    }
+
+    private String rateLimitCacheKey(String remoteAddr) {
+        return "/api/.*-" + remoteAddr;
     }
 }

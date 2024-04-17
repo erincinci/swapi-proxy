@@ -24,11 +24,12 @@ bucket4j:
   enabled: true
   filters:
     - cache-name: rate-limit-bucket
-      cache-key: getRemoteAddr()
       url: /api/.*
+      filter-method: servlet
       hide-http-response-headers: true
       rate-limits:
-        - bandwidths:
+        - cache-key: getRemoteAddr()
+          bandwidths:
             - capacity: 3
               time: 1
               unit: minutes
