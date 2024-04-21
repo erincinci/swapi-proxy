@@ -64,7 +64,6 @@ public class ProxyController {
     @SneakyThrows
     public Optional<Film> enrichIfNeeded(String remoteAddr, boolean enrich, Optional<Film> film) {
         // TODO: GENERIC?
-        // TODO: How to change rate-limit value for nested calls?
         if (enrich) {
             int numOfRequests = film.map(value -> value.getPeople().size()).orElse(0);
             if (numOfRequests > 0 && rateLimitService.consumeTokens(remoteAddr, numOfRequests)) {
