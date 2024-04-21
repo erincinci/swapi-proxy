@@ -7,6 +7,9 @@ import com.erincinci.swapiproxy.model.Film;
 import com.erincinci.swapiproxy.model.Person;
 import com.erincinci.swapiproxy.service.RateLimitService;
 import com.erincinci.swapiproxy.service.SwapiService;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -44,6 +47,13 @@ public class ProxyController {
                             Person.class,
                             Film.class
                     }))})})
+    @Parameters({
+            @Parameter(name = "type", in = ParameterIn.PATH, description = "Entity type to fetch",
+                    required = true, schema = @Schema(implementation = EntityType.class)),
+            @Parameter(name = "id", in = ParameterIn.PATH, description = "Entity ID",
+                    required = true),
+            @Parameter(name = "enrich", in = ParameterIn.QUERY, description = "Option to enrich result")
+    })
     @GetMapping("/entity/{type}/{id}")
     public ResponseEntity<? extends BaseEntity> getEntity(
             @NotNull HttpServletRequest request,
