@@ -8,10 +8,9 @@ import org.springframework.stereotype.Component;
 @Getter
 @Setter
 @Component
-@ConfigurationProperties("rate-limit")
-public class RateLimitProperties extends CacheProperties {
+@ConfigurationProperties("cache")
+public class CacheProperties {
 
-    private String cacheName;
-    private String headerKey;
-    private Long capacity;
+    private Long time;
+    private String timeUnit;
 }

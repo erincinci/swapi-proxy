@@ -33,7 +33,7 @@ dependencies {
     implementation("com.github.ben-manes.caffeine:jcache:3.1.8")
 
     // Bucket4j rate-limiter
-    implementation("com.giffing.bucket4j.spring.boot.starter:bucket4j-spring-boot-starter:0.12.6")
+    implementation("com.github.vladimir-bukhtoyarov:bucket4j-core:7.6.0")
 
     // Lombok
     compileOnly("org.projectlombok:lombok")
@@ -42,6 +42,7 @@ dependencies {
     // Retrofit HTTP Client
     implementation("com.squareup.retrofit2:retrofit:2.11.0")
     implementation("com.squareup.retrofit2:converter-jackson:2.11.0")
+    implementation("co.infinum:retromock:1.1.1")
 
     // Test
     testImplementation("org.springframework.boot:spring-boot-starter-test")
