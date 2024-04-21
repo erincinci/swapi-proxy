@@ -27,6 +27,9 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-web")
 
+    // Swagger API Docs
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0")
+
     // Caffeine In-memory Cache
     implementation("javax.cache:cache-api:1.1.1")
     implementation("com.github.ben-manes.caffeine:caffeine:3.1.8")

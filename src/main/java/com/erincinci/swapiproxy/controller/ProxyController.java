@@ -57,7 +57,7 @@ public class ProxyController {
             case SPECIES -> Optional.empty();
             case VEHICLES -> Optional.empty();
             case STARSHIPS -> Optional.empty();
-            default -> throw new BadRequestException();
+            default -> throw new BadRequestException("Invalid entity type [%s]".formatted(type));
         };
     }
 

@@ -1,8 +1,8 @@
 # SWAPI Proxy API
 
 - [SWAPI Docs](https://swapi.dev/documentation)
-
-> TODO
+- [Swagger UI for auto-generated docs](http://localhost:8080/swagger-ui/index.html)
+- [JSON Generated API Docs](http://localhost:8080/api-docs)
 
 ## Design Choices
 
@@ -11,6 +11,7 @@
 - Retrofit HTTP Client - TODO
 - Using Spring Cache Manager with Caffeine cache, as it's a near-optimal caching lib ([reference](https://github.com/ben-manes/caffeine))
 - Bucket4j for rate limiting our API - using Caffeine in-memory cache for buckets, and rate limiting per remote address
+- Swagger OpenAPI docs used for automatic API documentation generation (can be found in [/api-docs](http://localhost:8080/swagger-ui/index.html))
 
 ### Rate Limits
 
