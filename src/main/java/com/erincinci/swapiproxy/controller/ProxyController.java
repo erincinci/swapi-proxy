@@ -4,8 +4,13 @@ import com.erincinci.swapiproxy.exception.BadRequestException;
 import com.erincinci.swapiproxy.model.BaseEntity;
 import com.erincinci.swapiproxy.model.EntityType;
 import com.erincinci.swapiproxy.model.Film;
+import com.erincinci.swapiproxy.model.Person;
 import com.erincinci.swapiproxy.service.RateLimitService;
 import com.erincinci.swapiproxy.service.SwapiService;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.SneakyThrows;
 import org.jetbrains.annotations.NotNull;
@@ -33,6 +38,12 @@ public class ProxyController {
         this.swapiService = swapiService;
     }
 
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Fetch a SWAPI Entity",
+                    content = { @Content(mediaType = "application/json", schema = @Schema(oneOf = {
+                            Person.class,
+                            Film.class
+                    }))})})
     @GetMapping("/entity/{type}/{id}")
     public ResponseEntity<? extends BaseEntity> getEntity(
             @NotNull HttpServletRequest request,
