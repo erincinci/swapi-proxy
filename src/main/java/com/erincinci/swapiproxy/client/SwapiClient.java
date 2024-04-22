@@ -2,9 +2,7 @@ package com.erincinci.swapiproxy.client;
 
 import co.infinum.retromock.BodyFactory;
 import co.infinum.retromock.meta.*;
-import com.erincinci.swapiproxy.model.Film;
-import com.erincinci.swapiproxy.model.Person;
-import com.erincinci.swapiproxy.model.Starship;
+import com.erincinci.swapiproxy.model.*;
 import org.jetbrains.annotations.NotNull;
 import retrofit2.Call;
 import retrofit2.http.GET;
@@ -28,6 +26,15 @@ public interface SwapiClient {
     @MockCircular
     @MockBehavior(durationMillis = 50, durationDeviation = 10)
     @MockResponses({
+            @MockResponse(bodyFactory = MockBodyFactory.class, body = "mock-swapi/species-1.json")
+    })
+    @GET("species/{id}/")
+    Call<Species> getSpecies(@Path("id") String id);
+
+    @Mock
+    @MockCircular
+    @MockBehavior(durationMillis = 50, durationDeviation = 10)
+    @MockResponses({
             @MockResponse(bodyFactory = MockBodyFactory.class, body = "mock-swapi/film-1.json")
     })
     @GET("films/{id}/")
@@ -37,10 +44,28 @@ public interface SwapiClient {
     @MockCircular
     @MockBehavior(durationMillis = 50, durationDeviation = 10)
     @MockResponses({
+            @MockResponse(bodyFactory = MockBodyFactory.class, body = "mock-swapi/vehicle-1.json")
+    })
+    @GET("vehicles/{id}/")
+    Call<Vehicle> getVehicle(@Path("id") String id);
+
+    @Mock
+    @MockCircular
+    @MockBehavior(durationMillis = 50, durationDeviation = 10)
+    @MockResponses({
             @MockResponse(bodyFactory = MockBodyFactory.class, body = "mock-swapi/starship-1.json")
     })
     @GET("starships/{id}/")
     Call<Starship> getStarship(@Path("id") String id);
+
+    @Mock
+    @MockCircular
+    @MockBehavior(durationMillis = 50, durationDeviation = 10)
+    @MockResponses({
+            @MockResponse(bodyFactory = MockBodyFactory.class, body = "mock-swapi/planet-1.json")
+    })
+    @GET("planets/{id}/")
+    Call<Planet> getPlanet(@Path("id") String id);
 
     // Mock body loader for testing purposes
     class MockBodyFactory implements BodyFactory {

@@ -1,9 +1,6 @@
 package com.erincinci.swapiproxy.controller;
 
-import com.erincinci.swapiproxy.model.BaseEntity;
-import com.erincinci.swapiproxy.model.EntityType;
-import com.erincinci.swapiproxy.model.Film;
-import com.erincinci.swapiproxy.model.Person;
+import com.erincinci.swapiproxy.model.*;
 import com.erincinci.swapiproxy.service.EntityService;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -38,8 +35,7 @@ public class ProxyController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Fetch a SWAPI Entity",
                     content = { @Content(mediaType = "application/json", schema = @Schema(oneOf = {
-                            Person.class,
-                            Film.class
+                            Person.class, Species.class, Film.class, Vehicle.class, Starship.class, Planet.class
                     }))})})
     @Parameters({
             @Parameter(name = "type", in = ParameterIn.PATH, description = "Entity type to fetch",

@@ -21,13 +21,16 @@ public class Person extends BaseEntity {
     Gender gender;
     String height;
     String mass;
-    String homeworld; // TODO: Create Planet resource
+    @JsonDeserialize(using = EntityIdDeserializer.class)
+    Planet homeworld;
     @JsonDeserialize(contentUsing = EntityIdDeserializer.class)
     List<Film> films;
-    List<String> species; // TODO: Create Specie resource
+    @JsonDeserialize(contentUsing = EntityIdDeserializer.class)
+    List<Species> species;
     @JsonDeserialize(contentUsing = EntityIdDeserializer.class)
     List<Starship> starships;
-    List<String> vehicles; // TODO: Create Vehicle resource
+    @JsonDeserialize(contentUsing = EntityIdDeserializer.class)
+    List<Vehicle> vehicles;
 
     @Getter
     public enum Gender {

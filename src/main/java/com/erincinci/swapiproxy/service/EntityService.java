@@ -36,9 +36,11 @@ public class EntityService {
     public Optional<? extends BaseEntity> getEntity(EntityRequest request) throws IOException {
         return switch (request.entityType) {
             case PEOPLE -> getEnrichedEntity(swapiService::getPerson, this::enrichPerson, request);
+            case SPECIES -> getEnrichedEntity(swapiService::getSpecies, this::enrichSpecies, request);
             case FILMS -> getEnrichedEntity(swapiService::getFilm, this::enrichFilm, request);
-            case STARSHIPS -> getEnrichedEntity(swapiService::getStarship, this::enrichStarship, request);
-            // TODO: Implement remaining entity types
+            case VEHICLES -> getEnrichedEntity(swapiService::getVehicle, this::enrichVehicle, request);
+            case STARSHIPS -> getEnrichedEntity(swapiService::getStarship, this::enrichVehicle, request);
+            case PLANETS -> getEnrichedEntity(swapiService::getPlanet, this::enrichPlanet, request);
             default -> throw new BadRequestException("Invalid entity type [%s]".formatted(request.entityType));
         };
     }
@@ -71,9 +73,21 @@ public class EntityService {
 
     @Async("entityTaskExecutor")
     protected <E extends BaseEntity> CompletableFuture<Integer> enrichField(EntityRequest request,
-                                                                            Supplier<List<E>> dataSupplier,
-                                                                            Consumer<List<E>> setterFn,
+                                                                            Supplier<E> dataSupplier,
+                                                                            Consumer<E> setterFn,
                                                                             Function<String, Optional<E>> swapiFn) {
+        E dataToEnrich = dataSupplier.get();
+        if (rateLimitService.consumeToken(request.remoteAddr)) {
+            swapiFn.apply(dataToEnrich.getId()).ifPresent(setterFn);
+        }
+        return CompletableFuture.completedFuture(1);
+    }
+
+    @Async("entityTaskExecutor")
+    protected <E extends BaseEntity> CompletableFuture<Integer> enrichFieldList(EntityRequest request,
+                                                                                Supplier<List<E>> dataSupplier,
+                                                                                Consumer<List<E>> setterFn,
+                                                                                Function<String, Optional<E>> swapiFn) {
         List<E> dataToEnrich = dataSupplier.get();
         int numOfRequests = dataToEnrich.size();
 
@@ -91,24 +105,43 @@ public class EntityService {
 
     private int enrichPerson(Person entity, EntityRequest request) {
         return enrichEntity(List.of(
-                enrichField(request, entity::getFilms, entity::setFilms, swapiService::getFilm),
-                enrichField(request, entity::getStarships, entity::setStarships, swapiService::getStarship)
+                enrichField(request, entity::getHomeworld, entity::setHomeworld, swapiService::getPlanet),
+                enrichFieldList(request, entity::getFilms, entity::setFilms, swapiService::getFilm),
+                enrichFieldList(request, entity::getSpecies, entity::setSpecies, swapiService::getSpecies),
+                enrichFieldList(request, entity::getVehicles, entity::setVehicles, swapiService::getVehicle),
+                enrichFieldList(request, entity::getStarships, entity::setStarships, swapiService::getStarship)
+        ));
+    }
+
+    private int enrichSpecies(Species entity, EntityRequest request) {
+        return enrichEntity(List.of(
+                enrichField(request, entity::getHomeworld, entity::setHomeworld, swapiService::getPlanet),
+                enrichFieldList(request, entity::getFilms, entity::setFilms, swapiService::getFilm),
+                enrichFieldList(request, entity::getPeople, entity::setPeople, swapiService::getPerson)
         ));
     }
 
     private int enrichFilm(Film entity, EntityRequest request) {
         return enrichEntity(List.of(
-                enrichField(request, entity::getPeople, entity::setPeople, swapiService::getPerson),
-                enrichField(request, entity::getStarships, entity::setStarships, swapiService::getStarship)
+                enrichFieldList(request, entity::getPeople, entity::setPeople, swapiService::getPerson),
+                enrichFieldList(request, entity::getSpecies, entity::setSpecies, swapiService::getSpecies),
+                enrichFieldList(request, entity::getVehicles, entity::setVehicles, swapiService::getVehicle),
+                enrichFieldList(request, entity::getStarships, entity::setStarships, swapiService::getStarship),
+                enrichFieldList(request, entity::getPlanets, entity::setPlanets, swapiService::getPlanet)
         ));
     }
 
-    private int enrichStarship(Starship entity, EntityRequest request) {
+    private int enrichVehicle(Vehicle entity, EntityRequest request) {
         return enrichEntity(List.of(
-                enrichField(request, entity::getFilms, entity::setFilms, swapiService::getFilm),
-                enrichField(request, entity::getPilots, entity::setPilots, swapiService::getPerson)
+                enrichFieldList(request, entity::getFilms, entity::setFilms, swapiService::getFilm),
+                enrichFieldList(request, entity::getPilots, entity::setPilots, swapiService::getPerson)
         ));
     }
 
-    // TODO: Implement enricher for each remaining entity type
+    private int enrichPlanet(Planet entity, EntityRequest request) {
+        return enrichEntity(List.of(
+                enrichFieldList(request, entity::getResidents, entity::setResidents, swapiService::getPerson),
+                enrichFieldList(request, entity::getFilms, entity::setFilms, swapiService::getFilm)
+        ));
+    }
 }

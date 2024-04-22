@@ -37,9 +37,11 @@ public abstract class BaseEntity implements Serializable {
     protected static <E extends BaseEntity> E newEntity(String typeStr) {
         return switch (EntityType.fromValue(typeStr)) {
             case PEOPLE -> (E) new Person();
+            case SPECIES -> (E) new Species();
             case FILMS -> (E) new Film();
+            case VEHICLES -> (E) new Vehicle();
             case STARSHIPS -> (E) new Starship();
-            // TODO: Implement remaining entity types
+            case PLANETS -> (E) new Planet();
             default -> throw new BadRequestException("Invalid entity type [%s]".formatted(typeStr));
         };
     }

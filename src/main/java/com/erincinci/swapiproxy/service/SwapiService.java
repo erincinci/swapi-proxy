@@ -2,10 +2,7 @@ package com.erincinci.swapiproxy.service;
 
 import com.erincinci.swapiproxy.client.SwapiClient;
 import com.erincinci.swapiproxy.exception.BadGatewayException;
-import com.erincinci.swapiproxy.model.BaseEntity;
-import com.erincinci.swapiproxy.model.Film;
-import com.erincinci.swapiproxy.model.Person;
-import com.erincinci.swapiproxy.model.Starship;
+import com.erincinci.swapiproxy.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.CachePut;
@@ -32,14 +29,29 @@ public class SwapiService {
         return executeCall(swapiClient.getPerson(id), id);
     }
 
+    @CachePut(value = "species", key = "#id")
+    public Optional<Species> getSpecies(String id) {
+        return executeCall(swapiClient.getSpecies(id), id);
+    }
+
     @CachePut(value = "films", key = "#id")
     public Optional<Film> getFilm(String id) {
         return executeCall(swapiClient.getFilm(id), id);
     }
 
+    @CachePut(value = "vehicles", key = "#id")
+    public Optional<Vehicle> getVehicle(String id) {
+        return executeCall(swapiClient.getVehicle(id), id);
+    }
+
     @CachePut(value = "starships", key = "#id")
     public Optional<Starship> getStarship(String id) {
         return executeCall(swapiClient.getStarship(id), id);
+    }
+
+    @CachePut(value = "planets", key = "#id")
+    public Optional<Planet> getPlanet(String id) {
+        return executeCall(swapiClient.getPlanet(id), id);
     }
 
     private <T extends BaseEntity> Optional<T> executeCall(Call<T> call, String id) {

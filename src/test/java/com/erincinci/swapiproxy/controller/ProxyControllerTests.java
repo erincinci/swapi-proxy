@@ -61,8 +61,11 @@ public class ProxyControllerTests extends ApplicationTests {
         Assertions.assertEquals(200, result.getResponse().getStatus());
 
         String resultContent = result.getResponse().getContentAsString();
+        Assertions.assertFalse(resultContent.contains("Shyriiwook"));
         Assertions.assertFalse(resultContent.contains("Luke Skywalker"));
         Assertions.assertFalse(resultContent.contains("Sienar Fleet Systems"));
+        Assertions.assertFalse(resultContent.contains("Sand Crawler"));
+        Assertions.assertFalse(resultContent.contains("Tatooine"));
     }
 
     @Test
@@ -71,7 +74,7 @@ public class ProxyControllerTests extends ApplicationTests {
         MvcResult result = mockMvc.perform(get("/api/entity/films/1?enrich=true").with(remoteAddr(REMOTE_ADDR_1)))
                 .andExpect(status().isOk())
                 .andReturn();
-        verifyRateLimitState(REMOTE_ADDR_1, limitSpent(3L));
+        verifyRateLimitState(REMOTE_ADDR_1, limitSpent(6L));
         Assertions.assertEquals(200, result.getResponse().getStatus());
         String resultContent = result.getResponse().getContentAsString();
         Assertions.assertTrue(resultContent.contains("Luke Skywalker"));
@@ -79,11 +82,14 @@ public class ProxyControllerTests extends ApplicationTests {
         result = mockMvc.perform(get("/api/entity/people/1?enrich=true").with(remoteAddr(REMOTE_ADDR_1)))
                 .andExpect(status().isOk())
                 .andReturn();
-        verifyRateLimitState(REMOTE_ADDR_1, limitSpent(6L));
+        verifyRateLimitState(REMOTE_ADDR_1, limitSpent(12L));
         Assertions.assertEquals(200, result.getResponse().getStatus());
         resultContent = result.getResponse().getContentAsString();
-        Assertions.assertTrue(resultContent.contains("A New Hope"));
-        Assertions.assertTrue(resultContent.contains("Sienar Fleet Systems"));
+        Assertions.assertTrue(resultContent.contains("Shyriiwook")); // species
+        Assertions.assertTrue(resultContent.contains("A New Hope")); // film
+        Assertions.assertTrue(resultContent.contains("Sienar Fleet Systems")); // starship
+        Assertions.assertTrue(resultContent.contains("Sand Crawler")); // vehicle
+        Assertions.assertTrue(resultContent.contains("Tatooine")); // planet
     }
 
     private long limitSpent(long spent) {
