@@ -32,8 +32,8 @@ public class ProxyControllerTests extends ApplicationTests {
 
     @Test
     @DisplayName("should rate limit for remote address")
-    void testRateLimitForARemoteAddr() throws Exception {
-        for (int i = 0; i < 3; i++) {
+    void testRateLimitForRemoteAddr() throws Exception {
+        for (int i = 0; i < rateLimitProperties.getCapacity(); i++) {
             mockMvc.perform(get("/api/entity/people/1").with(remoteAddr(REMOTE_ADDR_1)))
                     .andExpect(status().isOk());
         }
@@ -42,7 +42,7 @@ public class ProxyControllerTests extends ApplicationTests {
 
         mockMvc.perform(get("/api/entity/people/1").with(remoteAddr(REMOTE_ADDR_2)))
                 .andExpect(status().isOk())
-                .andExpect(header().longValue(rateLimitProperties.getHeaderKey(), 2));
+                .andExpect(header().longValue(rateLimitProperties.getHeaderKey(), limitSpent(1L)));
     }
 
     @Test
@@ -57,7 +57,7 @@ public class ProxyControllerTests extends ApplicationTests {
         MvcResult result = mockMvc.perform(get("/api/entity/films/1").with(remoteAddr(REMOTE_ADDR_1)))
                 .andExpect(status().isOk())
                 .andReturn();
-        verifyRateLimitState(REMOTE_ADDR_1, 2L);
+        verifyRateLimitState(REMOTE_ADDR_1, limitSpent(1L));
         Assertions.assertEquals(200, result.getResponse().getStatus());
 
         String resultContent = result.getResponse().getContentAsString();
@@ -70,11 +70,22 @@ public class ProxyControllerTests extends ApplicationTests {
         MvcResult result = mockMvc.perform(get("/api/entity/films/1?enrich=true").with(remoteAddr(REMOTE_ADDR_1)))
                 .andExpect(status().isOk())
                 .andReturn();
-        verifyRateLimitState(REMOTE_ADDR_1, 1L);
+        verifyRateLimitState(REMOTE_ADDR_1, limitSpent(2L));
         Assertions.assertEquals(200, result.getResponse().getStatus());
-
         String resultContent = result.getResponse().getContentAsString();
         Assertions.assertTrue(resultContent.contains("Luke Skywalker"));
+
+        result = mockMvc.perform(get("/api/entity/people/1?enrich=true").with(remoteAddr(REMOTE_ADDR_1)))
+                .andExpect(status().isOk())
+                .andReturn();
+        verifyRateLimitState(REMOTE_ADDR_1, limitSpent(4L));
+        Assertions.assertEquals(200, result.getResponse().getStatus());
+        resultContent = result.getResponse().getContentAsString();
+        Assertions.assertTrue(resultContent.contains("A New Hope"));
+    }
+
+    private long limitSpent(long spent) {
+        return rateLimitProperties.getCapacity() - spent;
     }
 
     private void verifyRateLimitState(String remoteAddr, long remainingTokens) {

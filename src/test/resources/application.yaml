@@ -3,6 +3,10 @@ spring:
     active: test
   application:
     name: SWAPI-Proxy
+  task:
+    execution:
+      shutdown:
+        await-termination: true
 
 cache:
   time: 1
@@ -11,7 +15,7 @@ cache:
 rate-limit:
   cacheName: rate-limit-buckets
   headerKey: X-RateLimit-Remaining
-  capacity: 3
+  capacity: 5
   time: 1
   timeUnit: minutes
 

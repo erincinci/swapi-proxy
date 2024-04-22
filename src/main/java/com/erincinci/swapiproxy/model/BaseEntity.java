@@ -1,6 +1,7 @@
 package com.erincinci.swapiproxy.model;
 
 import com.erincinci.swapiproxy.exception.BadRequestException;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.core.JsonParser;
@@ -25,6 +26,7 @@ public abstract class BaseEntity implements Serializable {
     String id;
     Instant created;
     Instant edited;
+    @JsonIgnore boolean isEnriched;
 
     protected static String[] parseUriPaths(String uriString) {
         return URI.create(uriString).getPath().split("/");

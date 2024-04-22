@@ -7,7 +7,7 @@ import com.erincinci.swapiproxy.model.Film;
 import com.erincinci.swapiproxy.model.Person;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.stereotype.Service;
 import retrofit2.Call;
 import retrofit2.Response;
@@ -26,12 +26,12 @@ public class SwapiService {
         this.swapiClient = swapiClient;
     }
 
-    @Cacheable("people")
+    @CachePut(value = "people", key = "#id")
     public Optional<Person> getPerson(String id) {
         return executeCall(swapiClient.getPerson(id), id);
     }
 
-    @Cacheable("films")
+    @CachePut(value = "films", key = "#id")
     public Optional<Film> getFilm(String id) {
         return executeCall(swapiClient.getFilm(id), id);
     }

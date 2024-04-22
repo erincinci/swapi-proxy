@@ -12,6 +12,8 @@
 - Using Spring Cache Manager with Caffeine cache, as it's a near-optimal caching lib ([reference](https://github.com/ben-manes/caffeine))
 - Bucket4j for rate limiting our API - using Caffeine in-memory cache for buckets, and rate limiting per remote address
 - Swagger OpenAPI docs used for automatic API documentation generation (can be found in [/api-docs](http://localhost:8080/swagger-ui/index.html))
+- Decided not to use `BlockingBucket` for async entity enrichment tasks, for better performance. Please note that this may result in some incorrect usage of rate limits in corner cases
+- Spring Async Task Executor is used for parallel SWAPI enrichment tasks
 
 ### Rate Limits
 
@@ -24,3 +26,4 @@ Considered following options:
 ### Notes:
 
 - On 21st of April, SWAPI Let's Encrypt certificate got expired, still waiting for it to be renewed so that Java PKIX doesn't give out error.
+- For entity enrichment functionality, only 1 level of enriching operation is supported in nested entities in order to avoid any stack overflow issues.

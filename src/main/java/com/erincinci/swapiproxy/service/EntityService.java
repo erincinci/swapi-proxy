@@ -6,14 +6,21 @@ import com.erincinci.swapiproxy.model.EntityType;
 import com.erincinci.swapiproxy.model.Film;
 import com.erincinci.swapiproxy.model.Person;
 import kotlin.jvm.functions.Function2;
+import lombok.SneakyThrows;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
+
+import static pl.touk.throwing.ThrowingFunction.unchecked;
 
 @Service
 public class EntityService {
@@ -42,9 +49,11 @@ public class EntityService {
             Function<String, Optional<E>> swapiFn, Function2<E, EntityRequest, Integer> enrichFn, EntityRequest request) {
         Optional<E> optionalEntity = swapiFn.apply(request.entityId);
 
-        if (request.enrichData && optionalEntity.isPresent()) {
+        // If enrich flag is set & entity is fetched & entity is not already enriched (to prevent stack overflow)
+        if (request.enrichData && optionalEntity.isPresent() && !optionalEntity.get().isEnriched()) {
             E entity = optionalEntity.get();
             Integer totalRequests = enrichFn.invoke(entity, request);
+            entity.setEnriched(true);
             logger.info("Enriched entity [{}] with additional {} requests", request.entityId, totalRequests);
             return Optional.of(entity);
         }
@@ -52,27 +61,47 @@ public class EntityService {
         return optionalEntity;
     }
 
-    private int enrichFilm(Film film, EntityRequest request) {
-        int totalRequests = 0;
 
-        // TODO: More generic?
-        int numOfRequests = film.getPeople().size();
+    // Thrown exceptions are handled gracefully in `ControllerExceptionHandler` layer
+    @SneakyThrows
+    private int enrichEntity(List<CompletableFuture<Integer>> dataEnrichers) {
+        CompletableFuture.allOf(dataEnrichers.toArray(new CompletableFuture[0])).join();
+        return dataEnrichers.stream()
+                .map(unchecked(CompletableFuture::get))
+                .reduce(0, Integer::sum, Integer::sum);
+    }
+
+    @Async("entityTaskExecutor")
+    protected <E extends BaseEntity> CompletableFuture<Integer> enrichField(EntityRequest request,
+                                                                            Supplier<List<E>> dataSupplier,
+                                                                            Consumer<List<E>> setterFn,
+                                                                            Function<String, Optional<E>> swapiFn) {
+        List<E> dataToEnrich = dataSupplier.get();
+        int numOfRequests = dataToEnrich.size();
+
         if (numOfRequests > 0 && rateLimitService.consumeTokens(request.remoteAddr, numOfRequests)) {
-            List<Person> people = film.getPeople().stream()
+            List<E> enrichedData = dataToEnrich.parallelStream()
                     .map(BaseEntity::getId)
-                    .map(swapiService::getPerson)
+                    .map(swapiFn)
                     .filter(Optional::isPresent)
                     .map(Optional::get)
                     .toList();
-            film.setPeople(people);
-            totalRequests += numOfRequests;
+            setterFn.accept(enrichedData);
         }
-
-        return totalRequests;
+        return CompletableFuture.completedFuture(numOfRequests);
     }
 
-    private int enrichPerson(Person person, EntityRequest request) {
-        // TODO: Implement
-        return 0;
+    private int enrichFilm(Film entity, EntityRequest request) {
+        return enrichEntity(List.of(
+                enrichField(request, entity::getPeople, entity::setPeople, swapiService::getPerson))
+        );
     }
+
+    private int enrichPerson(Person entity, EntityRequest request) {
+        return enrichEntity(List.of(
+                enrichField(request, entity::getFilms, entity::setFilms, swapiService::getFilm))
+        );
+    }
+
+    // TODO: Implement enricher for each remaining entity type
 }

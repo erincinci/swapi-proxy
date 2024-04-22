@@ -38,9 +38,10 @@ dependencies {
     // Bucket4j rate-limiter
     implementation("com.github.vladimir-bukhtoyarov:bucket4j-core:7.6.0")
 
-    // Lombok
+    // Lombok & SneakyThrows
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
+    implementation("com.pivovarit:throwing-function:1.4")
 
     // Retrofit HTTP Client
     implementation("com.squareup.retrofit2:retrofit:2.11.0")

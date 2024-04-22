@@ -3,6 +3,10 @@ spring:
     active: prod
   application:
     name: SWAPI-Proxy
+  task:
+    execution:
+      shutdown:
+        await-termination: true
 
 springdoc:
   api-docs:
