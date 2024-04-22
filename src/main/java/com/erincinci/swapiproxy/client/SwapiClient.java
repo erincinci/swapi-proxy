@@ -2,7 +2,9 @@ package com.erincinci.swapiproxy.client;
 
 import co.infinum.retromock.BodyFactory;
 import co.infinum.retromock.meta.Mock;
+import co.infinum.retromock.meta.MockCircular;
 import co.infinum.retromock.meta.MockResponse;
+import co.infinum.retromock.meta.MockResponses;
 import com.erincinci.swapiproxy.model.Film;
 import com.erincinci.swapiproxy.model.Person;
 import org.jetbrains.annotations.NotNull;
@@ -16,12 +18,18 @@ import java.io.InputStream;
 public interface SwapiClient {
 
     @Mock
-    @MockResponse(bodyFactory = MockBodyFactory.class, body = "mock-swapi/person-1.json")
+    @MockCircular
+    @MockResponses({
+            @MockResponse(bodyFactory = MockBodyFactory.class, body = "mock-swapi/person-1.json")
+    })
     @GET("people/{id}/")
     Call<Person> getPerson(@Path("id") String id);
 
     @Mock
-    @MockResponse(bodyFactory = MockBodyFactory.class, body = "mock-swapi/film-1.json")
+    @MockCircular
+    @MockResponses({
+            @MockResponse(bodyFactory = MockBodyFactory.class, body = "mock-swapi/film-1.json")
+    })
     @GET("films/{id}/")
     Call<Film> getFilm(@Path("id") String id);
 

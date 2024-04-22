@@ -2,6 +2,7 @@ package com.erincinci.swapiproxy.service;
 
 import com.erincinci.swapiproxy.client.SwapiClient;
 import com.erincinci.swapiproxy.exception.BadGatewayException;
+import com.erincinci.swapiproxy.model.BaseEntity;
 import com.erincinci.swapiproxy.model.Film;
 import com.erincinci.swapiproxy.model.Person;
 import org.slf4j.Logger;
@@ -27,25 +28,26 @@ public class SwapiService {
 
     @Cacheable("people")
     public Optional<Person> getPerson(String id) {
-        logger.info("Get person with id {}", id);
-        return executeCall(swapiClient.getPerson(id));
+        return executeCall(swapiClient.getPerson(id), id);
     }
 
     @Cacheable("films")
     public Optional<Film> getFilm(String id) {
-        return executeCall(swapiClient.getFilm(id));
+        return executeCall(swapiClient.getFilm(id), id);
     }
 
-    private <T> Optional<T> executeCall(Call<T> call) {
+    private <T extends BaseEntity> Optional<T> executeCall(Call<T> call, String id) {
         try {
-            return parseResponse(call.execute());
+            Optional<T> optionalEntity = parseResponse(call.execute());
+            optionalEntity.ifPresent(entity -> entity.setId(id));
+            return optionalEntity;
         } catch (IOException e) {
             logger.error("Error in external API call: {}", e.getMessage());
             throw new BadGatewayException(e);
         }
     }
 
-    private <T> Optional<T> parseResponse(Response<T> response) {
+    private <T extends BaseEntity> Optional<T> parseResponse(Response<T> response) {
         return response.isSuccessful() ? Optional.ofNullable(response.body()) : Optional.empty();
     }
 }

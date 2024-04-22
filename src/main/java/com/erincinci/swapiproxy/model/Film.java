@@ -1,6 +1,7 @@
 package com.erincinci.swapiproxy.model;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -21,6 +22,7 @@ public class Film extends BaseEntity {
     List<String> starships; // TODO: Create Starship resource
     List<String> vehicles; // TODO: Create Vehicle resource
     List<String> planets; // TODO: Create Vehicle resource
-    @JsonAlias("characters") List<String> people;
-    List<Person> parsedPeople;
+    @JsonAlias("characters")
+    @JsonDeserialize(contentUsing = BaseEntity.EntityIdDeserializer.class)
+    List<Person> people;
 }

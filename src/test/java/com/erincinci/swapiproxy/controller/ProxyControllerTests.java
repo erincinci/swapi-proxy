@@ -1,8 +1,6 @@
 package com.erincinci.swapiproxy.controller;
 
 import com.erincinci.swapiproxy.ApplicationTests;
-import com.erincinci.swapiproxy.model.Film;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.bucket4j.Bucket;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,9 +24,6 @@ public class ProxyControllerTests extends ApplicationTests {
 
     @Autowired
     private MockMvc mockMvc;
-
-    @Autowired
-    private ObjectMapper objectMapper;
 
     @BeforeEach
     void setUp() {
@@ -57,15 +52,29 @@ public class ProxyControllerTests extends ApplicationTests {
     }
 
     @Test
-    @DisplayName("should rate limit with enrichment request")
-    void testRateLimitWithEnrichment() throws Exception {
+    @DisplayName("should return base response when no enrich flag is set")
+    void testWithoutEnrichedResponse() throws Exception {
+        MvcResult result = mockMvc.perform(get("/api/entity/films/1").with(remoteAddr(REMOTE_ADDR_1)))
+                .andExpect(status().isOk())
+                .andReturn();
+        verifyRateLimitState(REMOTE_ADDR_1, 2L);
+        Assertions.assertEquals(200, result.getResponse().getStatus());
+
+        String resultContent = result.getResponse().getContentAsString();
+        Assertions.assertFalse(resultContent.contains("Luke Skywalker"));
+    }
+
+    @Test
+    @DisplayName("should enrich response if flag is set")
+    void testWithEnrichedResponse() throws Exception {
         MvcResult result = mockMvc.perform(get("/api/entity/films/1?enrich=true").with(remoteAddr(REMOTE_ADDR_1)))
                 .andExpect(status().isOk())
                 .andReturn();
         verifyRateLimitState(REMOTE_ADDR_1, 1L);
+        Assertions.assertEquals(200, result.getResponse().getStatus());
 
-        Film film = objectMapper.readValue(result.getResponse().getContentAsString(), Film.class);
-        Assertions.assertEquals(1, film.getParsedPeople().size());
+        String resultContent = result.getResponse().getContentAsString();
+        Assertions.assertTrue(resultContent.contains("Luke Skywalker"));
     }
 
     private void verifyRateLimitState(String remoteAddr, long remainingTokens) {

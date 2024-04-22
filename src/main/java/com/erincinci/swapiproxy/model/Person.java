@@ -2,11 +2,11 @@ package com.erincinci.swapiproxy.model;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
-import java.time.Instant;
 import java.util.List;
 
 @Data
@@ -22,7 +22,8 @@ public class Person extends BaseEntity {
     String height;
     String mass;
     String homeworld; // TODO: Create Planet resource
-    List<String> films; // TODO: Create Film resource
+    @JsonDeserialize(contentUsing = BaseEntity.EntityIdDeserializer.class)
+    List<Film> films;
     List<String> species; // TODO: Create Specie resource
     List<String> starships; // TODO: Create Starship resource
     List<String> vehicles; // TODO: Create Vehicle resource
@@ -34,6 +35,6 @@ public class Person extends BaseEntity {
         @JsonProperty("n/a") NOT_AVAILABLE,
         @JsonProperty("male") MALE,
         @JsonProperty("female") FEMALE,
-        @JsonProperty("hermaphrodite") HERMAPHODITE
+        @JsonProperty("hermaphrodite") HERMAPHRODITE
     }
 }

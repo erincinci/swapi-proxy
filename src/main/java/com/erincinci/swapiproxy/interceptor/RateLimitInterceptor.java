@@ -1,7 +1,9 @@
 package com.erincinci.swapiproxy.interceptor;
 
 import com.erincinci.swapiproxy.config.RateLimitProperties;
+import com.erincinci.swapiproxy.handler.ControllerExceptionHandler;
 import com.erincinci.swapiproxy.service.RateLimitService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.jetbrains.annotations.NotNull;
@@ -18,10 +20,14 @@ public class RateLimitInterceptor implements HandlerInterceptor {
 
     private final RateLimitService rateLimitService;
     private final RateLimitProperties properties;
+    private final ObjectMapper objectMapper;
 
-    public RateLimitInterceptor(RateLimitService rateLimitService, RateLimitProperties properties) {
+    public RateLimitInterceptor(RateLimitService rateLimitService,
+                                RateLimitProperties properties,
+                                ObjectMapper objectMapper) {
         this.rateLimitService = rateLimitService;
         this.properties = properties;
+        this.objectMapper = objectMapper;
     }
 
     @Override
@@ -36,7 +42,9 @@ public class RateLimitInterceptor implements HandlerInterceptor {
         } else {
             logger.warn("Rate limit reached for {}", request.getRemoteAddr());
             response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());
-            response.getWriter().println("Rate limit reached");
+            response.getWriter().println(objectMapper.writeValueAsString(
+                    new ControllerExceptionHandler.ErrorMessage(
+                            HttpStatus.TOO_MANY_REQUESTS, "Rate limit reached")));
             return false;
         }
     }
