@@ -62,6 +62,7 @@ public class ProxyControllerTests extends ApplicationTests {
 
         String resultContent = result.getResponse().getContentAsString();
         Assertions.assertFalse(resultContent.contains("Luke Skywalker"));
+        Assertions.assertFalse(resultContent.contains("Sienar Fleet Systems"));
     }
 
     @Test
@@ -70,7 +71,7 @@ public class ProxyControllerTests extends ApplicationTests {
         MvcResult result = mockMvc.perform(get("/api/entity/films/1?enrich=true").with(remoteAddr(REMOTE_ADDR_1)))
                 .andExpect(status().isOk())
                 .andReturn();
-        verifyRateLimitState(REMOTE_ADDR_1, limitSpent(2L));
+        verifyRateLimitState(REMOTE_ADDR_1, limitSpent(3L));
         Assertions.assertEquals(200, result.getResponse().getStatus());
         String resultContent = result.getResponse().getContentAsString();
         Assertions.assertTrue(resultContent.contains("Luke Skywalker"));
@@ -78,10 +79,11 @@ public class ProxyControllerTests extends ApplicationTests {
         result = mockMvc.perform(get("/api/entity/people/1?enrich=true").with(remoteAddr(REMOTE_ADDR_1)))
                 .andExpect(status().isOk())
                 .andReturn();
-        verifyRateLimitState(REMOTE_ADDR_1, limitSpent(4L));
+        verifyRateLimitState(REMOTE_ADDR_1, limitSpent(6L));
         Assertions.assertEquals(200, result.getResponse().getStatus());
         resultContent = result.getResponse().getContentAsString();
         Assertions.assertTrue(resultContent.contains("A New Hope"));
+        Assertions.assertTrue(resultContent.contains("Sienar Fleet Systems"));
     }
 
     private long limitSpent(long spent) {

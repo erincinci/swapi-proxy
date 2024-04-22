@@ -5,6 +5,7 @@ import com.erincinci.swapiproxy.exception.BadGatewayException;
 import com.erincinci.swapiproxy.model.BaseEntity;
 import com.erincinci.swapiproxy.model.Film;
 import com.erincinci.swapiproxy.model.Person;
+import com.erincinci.swapiproxy.model.Starship;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.CachePut;
@@ -34,6 +35,11 @@ public class SwapiService {
     @CachePut(value = "films", key = "#id")
     public Optional<Film> getFilm(String id) {
         return executeCall(swapiClient.getFilm(id), id);
+    }
+
+    @CachePut(value = "starships", key = "#id")
+    public Optional<Starship> getStarship(String id) {
+        return executeCall(swapiClient.getStarship(id), id);
     }
 
     private <T extends BaseEntity> Optional<T> executeCall(Call<T> call, String id) {

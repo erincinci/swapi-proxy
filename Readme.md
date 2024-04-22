@@ -27,3 +27,4 @@ Considered following options:
 
 - On 21st of April, SWAPI Let's Encrypt certificate got expired, still waiting for it to be renewed so that Java PKIX doesn't give out error.
 - For entity enrichment functionality, only 1 level of enriching operation is supported in nested entities in order to avoid any stack overflow issues.
+- Some of the numeric fields text fields in SWAPI are also left as strings in our API, due to the incomplete documentation and non-standard examples seen.

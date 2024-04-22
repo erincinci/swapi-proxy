@@ -15,8 +15,8 @@ cache:
 rate-limit:
   cacheName: rate-limit-buckets
   headerKey: X-RateLimit-Remaining
-  capacity: 5
-  time: 1
+  capacity: 10
+  time: 10
   timeUnit: minutes
 
 client:

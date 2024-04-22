@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.net.URI;
 import java.time.Instant;
+import java.util.List;
 
 @Getter
 @Setter
@@ -37,12 +38,13 @@ public abstract class BaseEntity implements Serializable {
         return switch (EntityType.fromValue(typeStr)) {
             case PEOPLE -> (E) new Person();
             case FILMS -> (E) new Film();
+            case STARSHIPS -> (E) new Starship();
             // TODO: Implement remaining entity types
             default -> throw new BadRequestException("Invalid entity type [%s]".formatted(typeStr));
         };
     }
 
-    // Custom JSON deserializer, for deserializing blank entities with API path only
+    // Custom JSON deserializer for deserializing blank entities with API path only
     public static class EntityIdDeserializer<E extends BaseEntity> extends JsonDeserializer<E> {
 
         @Override
@@ -52,6 +54,16 @@ public abstract class BaseEntity implements Serializable {
             E entity = BaseEntity.newEntity(paths[PATH_TYPE_LOC]);
             entity.setId(paths[PATH_ID_LOC]);
             return entity;
+        }
+    }
+
+    // Custom JSON deserializer for parsing comma separated lists
+    public static class CommaSeparatedListDeserializer extends JsonDeserializer<List<String>> {
+
+        @Override
+        public List<String> deserialize(JsonParser jsonParser, DeserializationContext deserializationContext)
+                throws IOException, JacksonException {
+            return List.of(jsonParser.getText().trim().split(","));
         }
     }
 }

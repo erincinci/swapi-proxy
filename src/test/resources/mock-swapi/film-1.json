@@ -16,11 +16,11 @@
     "https://swapi.dev/api/species/1/"
   ],
   "starships": [
-    "https://swapi.dev/api/starships/2/"
+    "https://swapi.dev/api/starships/1/"
   ],
   "title": "A New Hope",
   "url": "https://swapi.dev/api/films/1/",
   "vehicles": [
-    "https://swapi.dev/api/vehicles/4/"
+    "https://swapi.dev/api/vehicles/1/"
   ]
 }

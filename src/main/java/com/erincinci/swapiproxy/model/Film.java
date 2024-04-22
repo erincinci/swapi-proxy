@@ -18,11 +18,12 @@ public class Film extends BaseEntity {
     @JsonAlias("release_date") LocalDate releaseDate;
     String director;
     String producer;
-    List<String> species; // TODO: Create Specie resource
-    List<String> starships; // TODO: Create Starship resource
+    List<String> species; // TODO: Create Species resource
+    @JsonDeserialize(contentUsing = EntityIdDeserializer.class)
+    List<Starship> starships;
     List<String> vehicles; // TODO: Create Vehicle resource
     List<String> planets; // TODO: Create Vehicle resource
     @JsonAlias("characters")
-    @JsonDeserialize(contentUsing = BaseEntity.EntityIdDeserializer.class)
+    @JsonDeserialize(contentUsing = EntityIdDeserializer.class)
     List<Person> people;
 }

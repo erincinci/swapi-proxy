@@ -22,10 +22,11 @@ public class Person extends BaseEntity {
     String height;
     String mass;
     String homeworld; // TODO: Create Planet resource
-    @JsonDeserialize(contentUsing = BaseEntity.EntityIdDeserializer.class)
+    @JsonDeserialize(contentUsing = EntityIdDeserializer.class)
     List<Film> films;
     List<String> species; // TODO: Create Specie resource
-    List<String> starships; // TODO: Create Starship resource
+    @JsonDeserialize(contentUsing = EntityIdDeserializer.class)
+    List<Starship> starships;
     List<String> vehicles; // TODO: Create Vehicle resource
 
     @Getter

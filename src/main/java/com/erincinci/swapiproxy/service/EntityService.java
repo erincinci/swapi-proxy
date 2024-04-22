@@ -1,10 +1,7 @@
 package com.erincinci.swapiproxy.service;
 
 import com.erincinci.swapiproxy.exception.BadRequestException;
-import com.erincinci.swapiproxy.model.BaseEntity;
-import com.erincinci.swapiproxy.model.EntityType;
-import com.erincinci.swapiproxy.model.Film;
-import com.erincinci.swapiproxy.model.Person;
+import com.erincinci.swapiproxy.model.*;
 import kotlin.jvm.functions.Function2;
 import lombok.SneakyThrows;
 import org.slf4j.Logger;
@@ -40,6 +37,7 @@ public class EntityService {
         return switch (request.entityType) {
             case PEOPLE -> getEnrichedEntity(swapiService::getPerson, this::enrichPerson, request);
             case FILMS -> getEnrichedEntity(swapiService::getFilm, this::enrichFilm, request);
+            case STARSHIPS -> getEnrichedEntity(swapiService::getStarship, this::enrichStarship, request);
             // TODO: Implement remaining entity types
             default -> throw new BadRequestException("Invalid entity type [%s]".formatted(request.entityType));
         };
@@ -91,16 +89,25 @@ public class EntityService {
         return CompletableFuture.completedFuture(numOfRequests);
     }
 
-    private int enrichFilm(Film entity, EntityRequest request) {
-        return enrichEntity(List.of(
-                enrichField(request, entity::getPeople, entity::setPeople, swapiService::getPerson))
-        );
-    }
-
     private int enrichPerson(Person entity, EntityRequest request) {
         return enrichEntity(List.of(
-                enrichField(request, entity::getFilms, entity::setFilms, swapiService::getFilm))
-        );
+                enrichField(request, entity::getFilms, entity::setFilms, swapiService::getFilm),
+                enrichField(request, entity::getStarships, entity::setStarships, swapiService::getStarship)
+        ));
+    }
+
+    private int enrichFilm(Film entity, EntityRequest request) {
+        return enrichEntity(List.of(
+                enrichField(request, entity::getPeople, entity::setPeople, swapiService::getPerson),
+                enrichField(request, entity::getStarships, entity::setStarships, swapiService::getStarship)
+        ));
+    }
+
+    private int enrichStarship(Starship entity, EntityRequest request) {
+        return enrichEntity(List.of(
+                enrichField(request, entity::getFilms, entity::setFilms, swapiService::getFilm),
+                enrichField(request, entity::getPilots, entity::setPilots, swapiService::getPerson)
+        ));
     }
 
     // TODO: Implement enricher for each remaining entity type
