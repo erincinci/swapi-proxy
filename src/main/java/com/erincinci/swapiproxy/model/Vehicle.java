@@ -28,4 +28,9 @@ public class Vehicle extends BaseEntity {
     List<Film> films;
     @JsonDeserialize(contentUsing = EntityIdDeserializer.class)
     List<Person> pilots;
+
+    @Override
+    public EntityType type() {
+        return EntityType.VEHICLES;
+    }
 }

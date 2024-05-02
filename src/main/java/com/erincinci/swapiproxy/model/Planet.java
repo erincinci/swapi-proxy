@@ -26,4 +26,9 @@ public class Planet extends BaseEntity {
     List<Person> residents;
     @JsonDeserialize(contentUsing = EntityIdDeserializer.class)
     List<Film> films;
+
+    @Override
+    public EntityType type() {
+        return EntityType.PLANETS;
+    }
 }

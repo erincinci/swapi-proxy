@@ -32,6 +32,11 @@ public class Person extends BaseEntity {
     @JsonDeserialize(contentUsing = EntityIdDeserializer.class)
     List<Vehicle> vehicles;
 
+    @Override
+    public EntityType type() {
+        return EntityType.PEOPLE;
+    }
+
     @Getter
     public enum Gender {
         @JsonProperty("unknown") UNKNOWN,

@@ -3,6 +3,7 @@ package com.erincinci.swapiproxy.model;
 import com.erincinci.swapiproxy.exception.BadRequestException;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
@@ -28,6 +29,13 @@ public abstract class BaseEntity implements Serializable {
     Instant created;
     Instant edited;
     @JsonIgnore boolean isEnriched;
+
+    public abstract EntityType type();
+
+    @JsonProperty(value = "id", access = JsonProperty.Access.READ_ONLY)
+    public String getIdPath() {
+        return String.format("/api/entity/%s/%s", type().getValue(), id);
+    }
 
     protected static String[] parseUriPaths(String uriString) {
         return URI.create(uriString).getPath().split("/");

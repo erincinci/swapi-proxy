@@ -10,4 +10,9 @@ public class Starship extends Vehicle {
 
     String mglt;
     @JsonAlias("hyperdrive_rating") String hyperdriveRating;
+
+    @Override
+    public EntityType type() {
+        return EntityType.STARSHIPS;
+    }
 }

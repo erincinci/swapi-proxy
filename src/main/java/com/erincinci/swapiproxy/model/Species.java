@@ -29,4 +29,9 @@ public class Species extends BaseEntity {
     List<Person> people;
     @JsonDeserialize(contentUsing = EntityIdDeserializer.class)
     List<Film> films;
+
+    @Override
+    public EntityType type() {
+        return EntityType.SPECIES;
+    }
 }

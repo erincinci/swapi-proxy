@@ -29,4 +29,9 @@ public class Film extends BaseEntity {
     @JsonAlias("characters")
     @JsonDeserialize(contentUsing = EntityIdDeserializer.class)
     List<Person> people;
+
+    @Override
+    public EntityType type() {
+        return EntityType.FILMS;
+    }
 }
