@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StopWatch;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -50,6 +51,8 @@ public class ProxyController {
             @RequestParam(required = false) boolean enrich,
             @PathVariable String type,
             @PathVariable String id) {
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
         try {
             final EntityService.EntityRequest entityRequest = new EntityService.EntityRequest(
                     enrich, EntityType.fromValue(type), id, request.getRemoteAddr());
@@ -58,6 +61,9 @@ public class ProxyController {
         } catch (IOException e) {
             logger.error("Error in API call", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        } finally {
+            stopWatch.stop();
+            logger.info("Exec time: {} ms", stopWatch.getTotalTimeMillis());
         }
     }
 

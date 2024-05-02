@@ -19,11 +19,11 @@ public class Vehicle extends BaseEntity {
     @JsonDeserialize(using = CommaSeparatedListDeserializer.class)
     @JsonAlias("manufacturer") List<String> manufacturers;
     @JsonAlias("cost_in_credits") String costInCredits;
-    Double length;
-    Long crew;
-    Long passengers;
+    String length;
+    String crew;
+    String passengers;
     @JsonAlias("max_atmosphering_speed") String maxAtmospheringSpeed;
-    @JsonAlias("cargo_capacity") Double cargoCapacityKg;
+    @JsonAlias("cargo_capacity") String cargoCapacityKg;
     @JsonDeserialize(contentUsing = EntityIdDeserializer.class)
     List<Film> films;
     @JsonDeserialize(contentUsing = EntityIdDeserializer.class)

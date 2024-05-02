@@ -15,8 +15,8 @@ public class Species extends BaseEntity {
     String classification;
     String designation;
     String language;
-    @JsonAlias("average_height") Double averageHeight;
-    @JsonAlias("average_lifespan") Long averageLifespanYears;
+    @JsonAlias("average_height") String averageHeight;
+    @JsonAlias("average_lifespan") String averageLifespanYears;
     @JsonDeserialize(using = CommaSeparatedListDeserializer.class)
     @JsonAlias("eye_colors")List<String> eyeColors;
     @JsonDeserialize(using = CommaSeparatedListDeserializer.class)

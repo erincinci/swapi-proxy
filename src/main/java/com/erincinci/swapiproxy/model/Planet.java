@@ -12,12 +12,12 @@ import java.util.List;
 public class Planet extends BaseEntity {
 
     String name;
-    Double gravity;
-    Long population;
-    @JsonAlias("diameter") Double diameterKm;
-    @JsonAlias("surface_water") Double surfaceWaterPercentage;
-    @JsonAlias("rotation_period") Double rotationPeriodHours;
-    @JsonAlias("orbital_period") Double orbitalPeriodDays;
+    String gravity;
+    String population;
+    @JsonAlias("diameter") String diameterKm;
+    @JsonAlias("surface_water") String surfaceWaterPercentage;
+    @JsonAlias("rotation_period") String rotationPeriodHours;
+    @JsonAlias("orbital_period") String orbitalPeriodDays;
     @JsonDeserialize(using = CommaSeparatedListDeserializer.class)
     List<String> climate;
     @JsonDeserialize(using = CommaSeparatedListDeserializer.class)
