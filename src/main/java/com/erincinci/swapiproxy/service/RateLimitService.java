@@ -4,6 +4,8 @@ import com.erincinci.swapiproxy.config.RateLimitProperties;
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;
 import io.github.bucket4j.local.LocalBucket;
+import jakarta.servlet.http.HttpServletResponse;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cache.Cache;
 import org.springframework.stereotype.Service;
@@ -29,6 +31,10 @@ public class RateLimitService {
 
     public boolean consumeTokens(String remoteAddr, long tokens) {
         return remoteAddrBucket(remoteAddr).tryConsume(tokens);
+    }
+
+    public void setRateLimitHeader(@NotNull HttpServletResponse response, String remoteAddr) {
+        response.setHeader(properties.getHeaderKey(), String.valueOf(remainingTokens(remoteAddr)));
     }
 
     public long remainingTokens(String remoteAddr) {

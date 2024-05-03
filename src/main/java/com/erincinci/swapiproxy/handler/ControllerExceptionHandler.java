@@ -3,6 +3,7 @@ package com.erincinci.swapiproxy.handler;
 import com.erincinci.swapiproxy.exception.BadGatewayException;
 import com.erincinci.swapiproxy.exception.BadRequestException;
 import com.erincinci.swapiproxy.exception.InternalServerException;
+import com.erincinci.swapiproxy.exception.RateLimitException;
 import org.springframework.core.convert.ConversionFailedException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +28,12 @@ public class ControllerExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<ErrorMessage> handleBadRequest(RuntimeException ex) {
         return new ResponseEntity<>(new ErrorMessage(HttpStatus.BAD_REQUEST, ex.getMessage()), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(RateLimitException.class)
+    @ResponseStatus(HttpStatus.TOO_MANY_REQUESTS)
+    public ResponseEntity<ErrorMessage> handleRateLimitReached(RuntimeException ex) {
+        return new ResponseEntity<>(new ErrorMessage(HttpStatus.TOO_MANY_REQUESTS, "Rate limit reached"), HttpStatus.TOO_MANY_REQUESTS);
     }
 
     @ExceptionHandler(BadGatewayException.class)

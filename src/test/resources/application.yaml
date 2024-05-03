@@ -3,6 +3,9 @@ spring:
     active: test
   application:
     name: SWAPI-Proxy
+  jackson:
+    mapper:
+      accept-case-insensitive-enums: true
   task:
     execution:
       shutdown:

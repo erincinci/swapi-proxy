@@ -23,7 +23,7 @@ import static pl.touk.throwing.ThrowingFunction.unchecked;
 public class EntityService {
 
     private static final Logger logger = LoggerFactory.getLogger(EntityService.class);
-    public record EntityRequest(boolean enrichData, EntityType entityType, String entityId, String remoteAddr) {}
+    public record Request(boolean enrichData, EntityType entityType, String entityId, String remoteAddr) {}
 
     private final SwapiService swapiService;
     private final RateLimitService rateLimitService;
@@ -33,7 +33,7 @@ public class EntityService {
         this.rateLimitService = rateLimitService;
     }
 
-    public Optional<? extends BaseEntity> getEntity(EntityRequest request) throws IOException {
+    public Optional<? extends BaseEntity> getEntity(Request request) throws IOException {
         return switch (request.entityType) {
             case PEOPLE -> getEnrichedEntity(swapiService::getPerson, this::enrichPerson, request);
             case SPECIES -> getEnrichedEntity(swapiService::getSpecies, this::enrichSpecies, request);
@@ -46,7 +46,7 @@ public class EntityService {
     }
 
     private <E extends BaseEntity> Optional<E> getEnrichedEntity(
-            Function<String, Optional<E>> swapiFn, Function2<E, EntityRequest, Integer> enrichFn, EntityRequest request) {
+            Function<String, Optional<E>> swapiFn, Function2<E, Request, Integer> enrichFn, Request request) {
         Optional<E> optionalEntity = swapiFn.apply(request.entityId);
 
         // If enrich flag is set & entity is fetched & entity is not already enriched (to prevent stack overflow)
@@ -72,7 +72,7 @@ public class EntityService {
     }
 
     @Async("entityTaskExecutor")
-    protected <E extends BaseEntity> CompletableFuture<Integer> enrichField(EntityRequest request,
+    protected <E extends BaseEntity> CompletableFuture<Integer> enrichField(Request request,
                                                                             Supplier<E> dataSupplier,
                                                                             Consumer<E> setterFn,
                                                                             Function<String, Optional<E>> swapiFn) {
@@ -84,7 +84,7 @@ public class EntityService {
     }
 
     @Async("entityTaskExecutor")
-    protected <E extends BaseEntity> CompletableFuture<Integer> enrichFieldList(EntityRequest request,
+    protected <E extends BaseEntity> CompletableFuture<Integer> enrichFieldList(Request request,
                                                                                 Supplier<List<E>> dataSupplier,
                                                                                 Consumer<List<E>> setterFn,
                                                                                 Function<String, Optional<E>> swapiFn) {
@@ -103,7 +103,7 @@ public class EntityService {
         return CompletableFuture.completedFuture(numOfRequests);
     }
 
-    private int enrichPerson(Person entity, EntityRequest request) {
+    private int enrichPerson(Person entity, Request request) {
         return enrichEntity(List.of(
                 enrichField(request, entity::getHomeworld, entity::setHomeworld, swapiService::getPlanet),
                 enrichFieldList(request, entity::getFilms, entity::setFilms, swapiService::getFilm),
@@ -113,7 +113,7 @@ public class EntityService {
         ));
     }
 
-    private int enrichSpecies(Species entity, EntityRequest request) {
+    private int enrichSpecies(Species entity, Request request) {
         return enrichEntity(List.of(
                 enrichField(request, entity::getHomeworld, entity::setHomeworld, swapiService::getPlanet),
                 enrichFieldList(request, entity::getFilms, entity::setFilms, swapiService::getFilm),
@@ -121,7 +121,7 @@ public class EntityService {
         ));
     }
 
-    private int enrichFilm(Film entity, EntityRequest request) {
+    private int enrichFilm(Film entity, Request request) {
         return enrichEntity(List.of(
                 enrichFieldList(request, entity::getPeople, entity::setPeople, swapiService::getPerson),
                 enrichFieldList(request, entity::getSpecies, entity::setSpecies, swapiService::getSpecies),
@@ -131,14 +131,14 @@ public class EntityService {
         ));
     }
 
-    private int enrichVehicle(Vehicle entity, EntityRequest request) {
+    private int enrichVehicle(Vehicle entity, Request request) {
         return enrichEntity(List.of(
                 enrichFieldList(request, entity::getFilms, entity::setFilms, swapiService::getFilm),
                 enrichFieldList(request, entity::getPilots, entity::setPilots, swapiService::getPerson)
         ));
     }
 
-    private int enrichPlanet(Planet entity, EntityRequest request) {
+    private int enrichPlanet(Planet entity, Request request) {
         return enrichEntity(List.of(
                 enrichFieldList(request, entity::getResidents, entity::setResidents, swapiService::getPerson),
                 enrichFieldList(request, entity::getFilms, entity::setFilms, swapiService::getFilm)
