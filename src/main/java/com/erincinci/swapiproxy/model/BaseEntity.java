@@ -22,6 +22,7 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public abstract class BaseEntity implements Serializable {
 
+    protected static final String API_PATH_FORMAT = "/api/entity/%s/%s";
     protected static final int PATH_TYPE_LOC = 2;
     protected static final int PATH_ID_LOC = 3;
 
@@ -34,7 +35,7 @@ public abstract class BaseEntity implements Serializable {
 
     @JsonProperty(value = "id", access = JsonProperty.Access.READ_ONLY)
     public String getIdPath() {
-        return String.format("/api/entity/%s/%s", type().getValue(), id);
+        return String.format(API_PATH_FORMAT, type().getValue(), id);
     }
 
     protected static String[] parseUriPaths(String uriString) {
