@@ -1,6 +1,7 @@
 package com.erincinci.swapiproxy.controller;
 
 import com.erincinci.swapiproxy.ApplicationTests;
+import com.fasterxml.jackson.databind.JsonNode;
 import io.github.bucket4j.Bucket;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -8,13 +9,15 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.RequestPostProcessor;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @AutoConfigureMockMvc
 public class ProxyControllerTests extends ApplicationTests {
@@ -49,6 +52,41 @@ public class ProxyControllerTests extends ApplicationTests {
     @DisplayName("should fail on bad entity request")
     void testGetEntityBadType() throws Exception {
         mockMvc.perform(get("/api/entity/bad/1")).andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("should fail on bad entities request")
+    void testGetEntitiesBadType() throws Exception {
+        mockMvc.perform(post("/api/entities/")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("[{\"type\":\"invalid\",\"ids\":[\"1\",\"2\"]}]"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("should return empty map for empty entities request")
+    void testGetEntitiesEmpty() throws Exception {
+        mockMvc.perform(post("/api/entities/")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("[]"))
+                .andExpect(status().isOk())
+                .andExpect(content().json("{}"));
+    }
+
+    @Test
+    @DisplayName("should return results for valid entities request")
+    void testGetEntitiesValid() throws Exception {
+        MvcResult result = mockMvc.perform(post("/api/entities/")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("[{\"type\":\"people\",\"ids\":[\"1\"]},{\"type\":\"films\",\"ids\":[\"1\"],\"enrich\":true}]"))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String resultContent = result.getResponse().getContentAsString();
+        JsonNode jsonNode = objectMapper.readTree(resultContent);
+        Assertions.assertEquals(2, jsonNode.size());
+        Assertions.assertEquals(1, jsonNode.get("PEOPLE").size());
+        Assertions.assertEquals(1, jsonNode.get("FILMS").size());
     }
 
     @Test

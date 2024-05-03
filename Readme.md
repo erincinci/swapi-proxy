@@ -62,3 +62,4 @@ Considered following options & implemented last option:
 - Even though in-memory cache is being used for efficiency, cache hits are not excluded from rate limits by design simplicity
 - Some of the numeric fields text fields in SWAPI are also left as strings in our API, due to the incomplete documentation and non-standard examples seen.
 - Defining a map `ApiResponse` description in Swagger is quite tedious, so bypassing for the sake of complexity in this case.
+- Rate limit tests are handled part of proxy controller tests, as they are tightly coupled.
