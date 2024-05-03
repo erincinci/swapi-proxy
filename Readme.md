@@ -10,6 +10,30 @@
 > ./gradlew bootRun
 ```
 
+## Sample Requests
+
+`enrich=true` will help to enrich response entity level-1 fields. Not including this parameter/field will default to `false`. In multi-entity requests, `enrich` field will be available for each entity type.
+
+### Get single Entity
+
+```http request
+GET /api/entity/films/1?enrich=true HTTP/1.1
+Host: localhost:8080
+```
+
+### Get Multiple Entities
+
+```http request
+POST /api/entities/ HTTP/1.1
+Host: localhost:8080
+Content-Type: application/json
+
+[
+    {"type": "people", "ids": ["1", "2"]},
+    {"type": "films", "ids": ["3"], "enrich": true}
+]
+```
+
 ## Design Choices
 
 - `Java` - Familiar with the language

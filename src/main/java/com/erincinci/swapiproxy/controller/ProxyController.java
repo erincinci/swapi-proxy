@@ -34,7 +34,7 @@ import java.util.stream.Collectors;
 public class ProxyController {
 
     private static final Logger logger = LoggerFactory.getLogger(ProxyController.class);
-    public record EntitiesRequest(EntityType type, List<String> ids, boolean enriched) {}
+    public record EntitiesRequest(EntityType type, List<String> ids, boolean enrich) {}
 
     private final EntityService entityService;
     private final RateLimitService rateLimitService;
@@ -94,7 +94,7 @@ public class ProxyController {
         logger.info("Got multi-request: {}", body);
         Map<EntityType, List<? extends BaseEntity>> results = body.parallelStream()
                 .flatMap(req -> req.ids().stream()
-                        .map(id -> new EntityService.Request(req.enriched(), req.type(), id, request.getRemoteAddr())))
+                        .map(id -> new EntityService.Request(req.enrich(), req.type(), id, request.getRemoteAddr())))
                 .collect(Collectors.groupingBy(
                         EntityService.Request::entityType,
                         Collectors.toList()
