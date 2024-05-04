@@ -1,5 +1,7 @@
 # SWAPI Proxy API
 
+<img src="https://upload.wikimedia.org/wikipedia/commons/7/7b/May_the_4th_be_with_you_%28Star_Wars_Day%29.gif" alt="May the 4th be with you" width="150" height="150" />
+
 A proxy API to enrich/aggregate calls to the public [SWAPI](https://swapi.dev/) endpoints. API caches part of the calls to be more efficient, and follows the same rate limits as SWAPI.
 
 ## Links
